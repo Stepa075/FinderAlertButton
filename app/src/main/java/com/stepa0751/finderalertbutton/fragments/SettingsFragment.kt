@@ -9,8 +9,11 @@ import com.stepa0751.finderalertbutton.R
 
 class SettingsFragment : PreferenceFragmentCompat(){
     private lateinit var timePref: Preference
-    private lateinit var idPref: Preference
     private lateinit var colorPref: Preference
+    private lateinit var crewPref: Preference
+    private lateinit var idPref: Preference
+    private lateinit var tokenPref: Preference
+
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.main_preferences, rootKey)
         init()
@@ -22,12 +25,16 @@ class SettingsFragment : PreferenceFragmentCompat(){
     private fun init(){
         timePref = findPreference("update_time_key")!!
         colorPref = findPreference("color_key")!!
-        idPref = findPreference("id_user_key")!!
+        crewPref = findPreference("id_crew_key")!!
+        idPref = findPreference("chat_id_key")!!
+        tokenPref = findPreference("token_key")!!
         val changeListener = onChangeListener()
         timePref.onPreferenceChangeListener = changeListener
+        colorPref.onPreferenceChangeListener = changeListener
+        crewPref.onPreferenceChangeListener = changeListener
         idPref.onPreferenceChangeListener = changeListener
 
-        colorPref.onPreferenceChangeListener = changeListener
+
         initPrefs()
     }
     //    пишем слушатель изменений в настройках
@@ -36,6 +43,7 @@ class SettingsFragment : PreferenceFragmentCompat(){
             when(pref.key){
                 "update_time_key" -> onTimeChange(value.toString())
                 "id_user_key" -> onIdChange(value.toString())
+                "id_crew_key" -> onIdChange(value.toString())
                 // здесь меняем цвет иконки лямбдой, даже не создавая отдельную функцию
                 "color_key" -> pref.icon?.setTint(Color.parseColor(value.toString()))
             }
@@ -52,8 +60,8 @@ class SettingsFragment : PreferenceFragmentCompat(){
     }
 
     private fun onIdChange(value: String) {
-        val title = idPref.title.toString().substringBefore(":")
-        idPref.title = "$title: ${value}"
+        val title = crewPref.title.toString().substringBefore(":")
+        crewPref.title = "$title: ${value}"
     }
 
 
@@ -61,15 +69,16 @@ class SettingsFragment : PreferenceFragmentCompat(){
     //   настраиваем показ сохраненных цифр и всего прочего при запуске экрана с настройками
     private fun initPrefs(){
 
-        val id_pref = idPref.preferenceManager.sharedPreferences
+//        val id_pref = idPref.preferenceManager.sharedPreferences
+        val crew_pref = crewPref.preferenceManager.sharedPreferences
         val pref = timePref.preferenceManager.sharedPreferences
         val nameArray = resources.getStringArray(R.array.loc_time_update_name)
         val valueArray = resources.getStringArray(R.array.loc_time_update_value)
         val title = timePref.title
         timePref.title = "$title: ${nameArray[valueArray.indexOf(pref?.getString("update_time_key", "5000") )]}"
 
-        val id_title = idPref.title
-        idPref.title = "$id_title: ${id_pref?.getString("id_user_key", "0")}"
+        val crew_title = crewPref.title
+        crewPref.title = "$crew_title: ${crew_pref?.getString("id_crew_key", "0")}"
 
         val color = pref?.getString("color_key", "#0636C3")
         colorPref.icon?.setTint(Color.parseColor(color))

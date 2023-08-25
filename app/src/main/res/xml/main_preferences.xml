@@ -24,7 +24,7 @@
         <EditTextPreference
             android:defaultValue=""
             android:title="@string/update_id"
-            android:key="id_user_key"
+            android:key="id_crew_key"
             app:icon="@drawable/ic_id_user"
             app:summary="@string/update_id_summary"/>
 
