@@ -33,6 +33,7 @@ class SettingsFragment : PreferenceFragmentCompat(){
         colorPref.onPreferenceChangeListener = changeListener
         crewPref.onPreferenceChangeListener = changeListener
         idPref.onPreferenceChangeListener = changeListener
+        tokenPref.onPreferenceChangeListener = changeListener
 
 
         initPrefs()
