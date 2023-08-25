@@ -23,16 +23,17 @@
 
         <EditTextPreference
             android:defaultValue=""
-            android:key="chat_id_key"
-            android:title="@string/update_chat_id"
-            app:icon="@drawable/ic_chat_id"
-            app:summary="@string/update_chat_id_summary" />
-        <EditTextPreference
-            android:defaultValue=""
             android:title="@string/update_id"
             android:key="id_user_key"
             app:icon="@drawable/ic_id_user"
             app:summary="@string/update_id_summary"/>
+
+        <EditTextPreference
+            android:defaultValue=""
+            android:title="@string/update_chat_id"
+            android:key="chat_id_key"
+            app:icon="@drawable/ic_chat_id"
+            app:summary="@string/update_chat_id_summary"/>
 
         <EditTextPreference
             android:defaultValue=""
