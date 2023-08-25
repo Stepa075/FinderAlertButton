@@ -1,12 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Reply Preference -->
-    <string-array name="reply_entries">
-        <item>Reply</item>
-        <item>Reply to all</item>
+    <string-array name="loc_time_update_name">
+        <item>3 sec</item>
+        <item>5 sec</item>
+        <item>10 sec</item>
     </string-array>
 
-    <string-array name="reply_values">
-        <item>reply</item>
-        <item>reply_all</item>
+    <string-array name="loc_time_update_value">
+        <item>3000</item>
+        <item>5000</item>
+        <item>10000</item>
     </string-array>
+
+    <string-array name="color_name">
+        <item>Blue</item>
+        <item>Red</item>
+        <item>Black</item>
+        <item>Purple</item>
+        <item>Yellow</item>
+    </string-array>
+
+    <string-array name="color_value">
+        <item>#0636C3</item>
+        <item>#EC0505</item>
+        <item>#FF000000</item>
+        <item>#9D20B3</item>
+        <item>#FFA406</item>
+    </string-array>
+
 </resources>

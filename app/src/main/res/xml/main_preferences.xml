@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory android:title="@string/general_settings">
+
+        <ListPreference
+            android:defaultValue="5000"
+            android:entries="@array/loc_time_update_name"
+            android:entryValues="@array/loc_time_update_value"
+            android:key="update_time_key"
+            android:title="@string/update_time"
+            app:icon="@drawable/ic_update_time"
+            app:summary="@string/update_time_summary" />
+
+        <ListPreference
+            android:defaultValue="#0636C3"
+            android:entries="@array/color_name"
+            android:entryValues="@array/color_value"
+            android:key="color_key"
+            android:title="@string/choose_color"
+            app:icon="@drawable/ic_circle" />
+
+        <EditTextPreference
+            android:defaultValue=""
+            android:key="chat_id_key"
+            android:title="@string/update_chat_id"
+            app:icon="@drawable/ic_chat_id"
+            app:summary="@string/update_chat_id_summary" />
+        <EditTextPreference
+            android:defaultValue=""
+            android:title="@string/update_id"
+            android:key="id_user_key"
+            app:icon="@drawable/ic_id_user"
+            app:summary="@string/update_id_summary"/>
+
+        <EditTextPreference
+            android:defaultValue=""
+            android:title="@string/token"
+            android:key="token_key"
+            app:icon="@drawable/ic_token"
+            app:summary="@string/token_summary"/>
+    </PreferenceCategory>
+</PreferenceScreen>
