@@ -8,7 +8,6 @@ import com.stepa0751.finderalertbutton.R
 
 
 class SettingsFragment : PreferenceFragmentCompat() {
-
     private lateinit var timePref: Preference
     private lateinit var serverTimePref: Preference
     private lateinit var colorPref: Preference
@@ -18,6 +17,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.main_preferences, rootKey)
+
         init()
     }
 
@@ -82,7 +82,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     //   настраиваем показ сохраненных цифр и всего прочего при запуске экрана с настройками
     private fun initPrefs() {
-
 //        val id_pref = idPref.preferenceManager.sharedPreferences
         val crew_pref = crewPref.preferenceManager.sharedPreferences
         val pref = timePref.preferenceManager.sharedPreferences

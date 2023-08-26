@@ -4,6 +4,7 @@
 
     <PreferenceCategory
         android:title="@string/general_settings"
+        app:allowDividerAbove="false"
         app:enabled="true"
         app:icon="@drawable/ic_general_settings"
         app:iconSpaceReserved="false"
