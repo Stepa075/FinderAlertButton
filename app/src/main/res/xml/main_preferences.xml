@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <PreferenceCategory
         android:title="@string/general_settings"
         app:allowDividerAbove="false"
+        app:allowDividerBelow="false"
         app:enabled="true"
         app:icon="@drawable/ic_general_settings"
         app:iconSpaceReserved="false"
@@ -42,19 +43,25 @@
             android:title="@string/update_id"
             app:icon="@drawable/ic_id_user"
             app:summary="@string/update_id_summary" />
+        <PreferenceCategory
+            android:title="Telegram settings"
+            app:allowDividerAbove="false"
+            app:allowDividerBelow="false"
+            app:icon="@drawable/telegram__1_">
 
-        <EditTextPreference
-            android:defaultValue=""
-            android:key="chat_id_key"
-            android:title="@string/update_chat_id"
-            app:icon="@drawable/ic_chat_id"
-            app:summary="@string/update_chat_id_summary" />
+            <EditTextPreference
+                android:defaultValue=""
+                android:key="chat_id_key"
+                android:title="@string/update_chat_id"
+                app:icon="@drawable/ic_chat_id"
+                app:summary="@string/update_chat_id_summary" />
+            <EditTextPreference
+                android:defaultValue=""
+                android:key="token_key"
+                android:title="@string/token"
+                app:icon="@drawable/ic_token"
+                app:summary="@string/token_summary" />
+        </PreferenceCategory>
 
-        <EditTextPreference
-            android:defaultValue=""
-            android:key="token_key"
-            android:title="@string/token"
-            app:icon="@drawable/ic_token"
-            app:summary="@string/token_summary" />
     </PreferenceCategory>
 </PreferenceScreen>

@@ -15,6 +15,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private lateinit var idPref: Preference
     private lateinit var tokenPref: Preference
 
+
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.main_preferences, rootKey)
 
