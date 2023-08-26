@@ -7,10 +7,10 @@
         android:id="@+id/id_home"
         android:orderInCategory="100" />
     <item
-        android:title="Map"
+        android:id="@+id/id_routes"
         android:icon="@drawable/ic_map"
-        android:id="@+id/id_map"
-        android:orderInCategory="200" />
+        android:orderInCategory="200"
+        android:title="Routes" />
 
     <item
         android:title="@string/settings"
