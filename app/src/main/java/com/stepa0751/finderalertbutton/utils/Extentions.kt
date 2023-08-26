@@ -1,5 +1,3 @@
-package com.stepa0751.finderalertbutton.utils
-
 import android.content.pm.PackageManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -7,6 +5,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.stepa0751.finderalertbutton.R
+
 
 
 // Функция для переключения между фрагментами
@@ -34,4 +33,20 @@ fun AppCompatActivity.openFragment(f: Fragment){
         .beginTransaction()
         .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
         .replace(R.id.placeHolder, f).commit()
+}
+
+//Экстеншин функции для показа сообщений во фрагментах и MainActivity
+fun Fragment.showToast(s: String){
+    Toast.makeText(activity, s, Toast.LENGTH_SHORT).show()
+}
+
+fun AppCompatActivity.showToast(s: String){
+    Toast.makeText(this, s, Toast.LENGTH_SHORT).show()
+}
+//  Функция определения даны ли разрешения
+fun Fragment.checkPermission(p: String): Boolean{
+    return when(PackageManager.PERMISSION_GRANTED){
+        ContextCompat.checkSelfPermission(activity as AppCompatActivity, p) -> true
+        else -> false
+    }
 }
