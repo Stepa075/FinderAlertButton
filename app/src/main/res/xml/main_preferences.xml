@@ -2,7 +2,13 @@
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <PreferenceCategory android:title="@string/general_settings">
+    <PreferenceCategory
+        android:title="@string/general_settings"
+        app:enabled="true"
+        app:icon="@drawable/ic_general_settings"
+        app:iconSpaceReserved="false"
+        app:key="pref_category"
+        app:singleLineTitle="true">
 
         <ListPreference
             android:defaultValue="5000"
@@ -14,6 +20,14 @@
             app:summary="@string/update_time_summary" />
 
         <ListPreference
+            android:defaultValue="5000"
+            android:entries="@array/server_time_update_name"
+            android:entryValues="@array/server_time_update_value"
+            android:key="server_update_key"
+            android:title="@string/server_update_time"
+            app:icon="@drawable/ic_update_time"
+            app:summary="@string/server_update_time_summary" />
+        <ListPreference
             android:defaultValue="#0636C3"
             android:entries="@array/color_name"
             android:entryValues="@array/color_value"
@@ -23,23 +37,23 @@
 
         <EditTextPreference
             android:defaultValue=""
-            android:title="@string/update_id"
             android:key="id_crew_key"
+            android:title="@string/update_id"
             app:icon="@drawable/ic_id_user"
-            app:summary="@string/update_id_summary"/>
+            app:summary="@string/update_id_summary" />
 
         <EditTextPreference
             android:defaultValue=""
-            android:title="@string/update_chat_id"
             android:key="chat_id_key"
+            android:title="@string/update_chat_id"
             app:icon="@drawable/ic_chat_id"
-            app:summary="@string/update_chat_id_summary"/>
+            app:summary="@string/update_chat_id_summary" />
 
         <EditTextPreference
             android:defaultValue=""
-            android:title="@string/token"
             android:key="token_key"
+            android:title="@string/token"
             app:icon="@drawable/ic_token"
-            app:summary="@string/token_summary"/>
+            app:summary="@string/token_summary" />
     </PreferenceCategory>
 </PreferenceScreen>

@@ -19,9 +19,12 @@
     <string name="update_time">Update time GPS receiver</string>
     <string name="update_time_summary">My location GPS update time</string>
 
+    <string name="server_update_time">Update time server info</string>
+    <string name="server_update_time_summary">Server request update time</string>
+
     <string name="choose_color">Choose color markers on map</string>
 
-    <string name="update_chat_id">You CHAT ID is</string>
+    <string name="update_chat_id">You CHAT ID</string>
     <string name="update_chat_id_summary">Change your chat ID here</string>
 
     <string name="update_crew_id">My CREW ID</string>
