@@ -39,6 +39,9 @@ android {
 
 dependencies {
 
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-protobuf:1.2.0")
+
     implementation"com.android.volley:volley:1.2.1"
 
     implementation 'org.osmdroid:osmdroid-android:6.1.10'

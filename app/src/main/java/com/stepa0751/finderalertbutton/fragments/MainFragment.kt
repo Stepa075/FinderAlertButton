@@ -7,7 +7,6 @@ import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
-import android.util.JsonReader
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -21,15 +20,18 @@ import androidx.lifecycle.MutableLiveData
 import androidx.preference.PreferenceManager
 import checkPermission
 import com.android.volley.Request
-import com.android.volley.toolbox.JsonArrayRequest
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
-import com.google.gson.JsonArray
 import com.stepa0751.finderalertbutton.R
 import com.stepa0751.finderalertbutton.databinding.FragmentMainBinding
 import com.stepa0751.finderalertbutton.location.LocationService
 import com.stepa0751.finderalertbutton.utils.DialogManager
 import com.stepa0751.finderalertbutton.utils.TimeUtils
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.StringFormat
+import kotlinx.serialization.decodeFromString
+
+import kotlinx.serialization.json.Json
 import showToast
 import java.util.Timer
 import java.util.TimerTask
@@ -68,6 +70,7 @@ class MainFragment : Fragment() {
 
     }
 
+    @OptIn(ExperimentalSerializationApi::class)
     private fun receiveDataAndLocation(){
         val queue = Volley.newRequestQueue(context)
         val user_id_pref = context?.let {
@@ -92,9 +95,9 @@ class MainFragment : Fragment() {
             url, { response ->
 
                 val str = response
-                val list: List<String> = str.split(",").toList()
+                val list: List<String> = str.split("[", "]").toList()
 
-                Log.d("MyLog", "Response: ${list[1]}")
+                Log.d("MyLog", "Response: ${list}")
 //                dayList.value = list
 //                currentDay.value = list[0]
             },
@@ -273,3 +276,5 @@ class MainFragment : Fragment() {
         fun newInstance() = MainFragment()
     }
 }
+
+
