@@ -1,11 +1,13 @@
 package com.stepa0751.finderalertbutton.fragments
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
+import android.provider.ContactsContract
 import android.provider.Settings
 import android.util.Log
 import android.view.LayoutInflater
@@ -23,15 +25,17 @@ import com.android.volley.Request
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.stepa0751.finderalertbutton.R
+import com.stepa0751.finderalertbutton.alerts.AlertsModel
 import com.stepa0751.finderalertbutton.databinding.FragmentMainBinding
 import com.stepa0751.finderalertbutton.location.LocationService
 import com.stepa0751.finderalertbutton.utils.DialogManager
 import com.stepa0751.finderalertbutton.utils.TimeUtils
-import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.StringFormat
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
-
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.Json.Default.decodeFromString
+import org.json.JSONArray
+import org.json.JSONObject
 import showToast
 import java.util.Timer
 import java.util.TimerTask
@@ -70,7 +74,7 @@ class MainFragment : Fragment() {
 
     }
 
-    @OptIn(ExperimentalSerializationApi::class)
+
     private fun receiveDataAndLocation(){
         val queue = Volley.newRequestQueue(context)
         val user_id_pref = context?.let {
@@ -94,17 +98,46 @@ class MainFragment : Fragment() {
             Request.Method.GET,
             url, { response ->
 
-                val str = response
-                val list: List<String> = str.split("[", "]").toList()
-
-                Log.d("MyLog", "Response: ${list}")
-//                dayList.value = list
-//                currentDay.value = list[0]
+                parseServerResponse(response)
+//                val str = response
+//                val list: List<String> = str.split(",").toList()
+//                for (i in list){
+//                   Log.d("MyLog", "Response: $i")
+//                }
             },
             { Log.d("MyLog", "Error request: $it") }
         )
         queue.add(sRequest)
 
+    }
+
+    @SuppressLint("NewApi")
+    private fun parseServerResponse(response: String){
+        var list = JSONObject()
+val mainObject = JSONObject(response)
+        val item = mainObject.getJSONArray("result")
+        for (i in 0 until item.length()){
+            val ddd = item[i] as JSONObject
+            val xxx = ddd as JSONObject
+            Log.d("MyLog", "JSON Response: ${ddd.get("update_id")}")
+
+        }
+//        val item2 = mainObject.getJSONArray("")
+//        val item_x = item2.get
+//        val update_id = item2.getString("update_id")
+//        val message = item2.getJSONObject("message")
+//        val text = message.getString("text")
+//        val item = AlertsModel(
+//            update_id = (mainObject.getJSONObject("result").getString("update_id").toInt())
+//
+//        )
+        Log.d("MyLog", "JSON Response: ${mainObject}")
+
+//        Log.d("MyLog", "JSON Response: ${item_x}")
+//        Log.d("MyLog", "JSON Response: ${item2}")
+//        Log.d("MyLog", "JSON Response: ${update_id}")
+//        Log.d("MyLog", "JSON Response: ${message}")
+//        Log.d("MyLog", "JSON Response: ${text}")
     }
 
     //  Когда возвращаемся в вью проверяем доступность местонахождения в телефоне
