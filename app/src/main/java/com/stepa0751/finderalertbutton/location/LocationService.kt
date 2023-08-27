@@ -32,7 +32,7 @@ import org.osmdroid.util.GeoPoint
 
 //  Создали сервис для работы в фоновом режиме... В манифесте его нужно прописать!!!
 class LocationService : Service() {
-    private val queue = Volley.newRequestQueue(baseContext)
+
     //  Переменная для хранения последнего местоположения для измерения расстояния между старой и новой точками
     private var lastLocation: Location? = null
     //  Переменная для хранения высчтанного расстояния
@@ -185,7 +185,7 @@ class LocationService : Service() {
         val chat_id_pref = PreferenceManager.getDefaultSharedPreferences(baseContext)
             .getString("chat_id_key", "")
 
-//        val id_user_program = "0001"
+        val queue = Volley.newRequestQueue(baseContext)
         val lat = latit.toString()
         val lon = longit.toString()
         val url = "https://api.telegram.org/bot${token_pref}/sendmessage?chat_id=-${chat_id_pref}&text=User ID: ${user_id_pref}. Allert button pressed! Location: ${lat}, ${lon}"

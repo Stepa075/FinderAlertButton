@@ -7,6 +7,8 @@ import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.util.JsonReader
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,19 +18,25 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
+import androidx.preference.PreferenceManager
 import checkPermission
+import com.android.volley.Request
+import com.android.volley.toolbox.JsonArrayRequest
+import com.android.volley.toolbox.StringRequest
+import com.android.volley.toolbox.Volley
+import com.google.gson.JsonArray
 import com.stepa0751.finderalertbutton.R
 import com.stepa0751.finderalertbutton.databinding.FragmentMainBinding
 import com.stepa0751.finderalertbutton.location.LocationService
 import com.stepa0751.finderalertbutton.utils.DialogManager
 import com.stepa0751.finderalertbutton.utils.TimeUtils
 import showToast
-
 import java.util.Timer
 import java.util.TimerTask
 
 
 class MainFragment : Fragment() {
+
     private var timer: Timer? = null
     private var startTime = 0L
     val timeData = MutableLiveData<String>()
@@ -56,6 +64,43 @@ class MainFragment : Fragment() {
         checkServiceState()
         setOnClicks()
         updateTime()
+        receiveDataAndLocation()
+
+    }
+
+    private fun receiveDataAndLocation(){
+        val queue = Volley.newRequestQueue(context)
+        val user_id_pref = context?.let {
+            PreferenceManager.getDefaultSharedPreferences(it)
+                .getString("id_user_key", "0000")
+        }
+        val token_pref = context?.let {
+            PreferenceManager.getDefaultSharedPreferences(it)
+                .getString("token_key", "")
+        }
+        val chat_id_pref = context?.let {
+            PreferenceManager.getDefaultSharedPreferences(it)
+                .getString("chat_id_key", "")
+        }
+
+//        val lat = latit.toString()
+//        val lon = longit.toString()
+        val url = "https://api.telegram.org/bot${token_pref}/getUpdates?chat_id=-${chat_id_pref}"
+
+        val sRequest = StringRequest(
+            Request.Method.GET,
+            url, { response ->
+
+                val str = response
+                val list: List<String> = str.split(",").toList()
+
+                Log.d("MyLog", "Response: ${list[1]}")
+//                dayList.value = list
+//                currentDay.value = list[0]
+            },
+            { Log.d("MyLog", "Error request: $it") }
+        )
+        queue.add(sRequest)
 
     }
 
