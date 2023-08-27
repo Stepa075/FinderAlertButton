@@ -1,100 +1,135 @@
 package com.stepa0751.finderalertbutton.fragments
 
 import android.Manifest
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import android.content.IntentFilter
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.MutableLiveData
 import checkPermission
-import com.stepa0751.findalertbutton.utils.DialogManager
-import com.stepa0751.finderalertbutton.location.LocationService
-import com.stepa0751.finderalertbutton.location.LocationModel
+import com.stepa0751.finderalertbutton.R
 import com.stepa0751.finderalertbutton.databinding.FragmentMainBinding
-import org.osmdroid.config.Configuration
-import org.osmdroid.library.BuildConfig
-import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
-import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
+import com.stepa0751.finderalertbutton.location.LocationService
+import com.stepa0751.finderalertbutton.utils.DialogManager
+import com.stepa0751.finderalertbutton.utils.TimeUtils
 import showToast
+
+import java.util.Timer
+import java.util.TimerTask
 
 
 class MainFragment : Fragment() {
-
+    private var timer: Timer? = null
+    private var startTime = 0L
+    val timeData = MutableLiveData<String>()
     private lateinit var pLauncher: ActivityResultLauncher<Array<String>>
+
+    //    Создаем переменную binding
     private lateinit var binding: FragmentMainBinding
+    private var isServiceRunning = false
 
-
+    // Надуваем инфлейтер и получаем доступ ко всем элементов вью
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        settingsOsm()
+        // Инициализируем binding c инфлейтером, который пришел нам в onCreateView см. выше
         binding = FragmentMainBinding.inflate(inflater, container, false)
         // полцчаем доступ ко всем элементам разметки
         return binding.root
     }
 
+    //  Инициализируем все, что необходимо после создания вью
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         registerPermissions()
-        registerLocReceiver()
-
+        checkServiceState()
+        setOnClicks()
+        updateTime()
 
     }
+
+    //  Когда возвращаемся в вью проверяем доступность местонахождения в телефоне
     override fun onResume() {
         super.onResume()
         checkLocPermission()
+
     }
 
-    //  функция начальной настройки карт ОСМ. Запускать ее нужно ДО надувания инфлейта!!!
-    private fun settingsOsm() {
-        Configuration.getInstance().load(
-            activity as AppCompatActivity,
-            activity?.getSharedPreferences("osm_pref", Context.MODE_PRIVATE)
-        )
-        Configuration.getInstance().userAgentValue = BuildConfig.APPLICATION_ID
-    }
-
-    //  Настройка отображения карт......... Посмотреть документацию!!!
-    private fun initOsm() = with(binding) {
-        map.controller.setZoom(18.0)
-        val myLocProvider = GpsMyLocationProvider(activity)
-        val myLocOverlay = MyLocationNewOverlay(myLocProvider, map)
-        myLocOverlay.enableMyLocation()
-        myLocOverlay.enableFollowLocation()
-        myLocOverlay.runOnFirstFix {
-            map.overlays.clear()
-            map.overlays.add(myLocOverlay)
-        }
-    }
-    //  Нихрена эта функция не срабатывает. Запрос на разрешения не появляется.
     private fun registerPermissions() {
         pLauncher = registerForActivityResult(
-            ActivityResultContracts.RequestMultiplePermissions()) {
+            ActivityResultContracts.RequestMultiplePermissions()
+        ) {
 
             if (it[Manifest.permission.ACCESS_FINE_LOCATION] == true) {
-                initOsm()
+//                initOsm()
                 checkLocationEnabled()
             } else {
-                Toast.makeText(context, "You have not given permission for location tracking. The app don't work!", Toast.LENGTH_SHORT).show()
+                showToast("You have not given permission for location tracking. The app don't work!")
 
             }
         }
     }
-    //   Функция выбора пермиссинов в зависимости от версии андроида
+
+
+    private fun checkServiceState() {
+        isServiceRunning = LocationService.isRunning
+        if (isServiceRunning) {
+            binding.startStop.setImageResource(R.drawable.ic_alarm_red)
+        }
+    }
+
+
+    //  Функция инициализации слушателя нажатий для ВСЕГО ВЬЮ
+    fun setOnClicks() = with(binding) {
+        val listener = onClicks()
+        startStop.setOnClickListener(listener)
+    }
+
+    //  Функция сработки слушателя нажатий на этом вью
+    private fun onClicks(): View.OnClickListener {
+        return View.OnClickListener {
+            when (it.id) {
+                R.id.start_stop -> startStopService()
+            }
+        }
+    }
+
+
+    //  Обновление времени в tv_text с помощью обсервера, который слушает изменения в переменной timeData типа MutableLiveData<String>()
+    private fun updateTime() {
+        timeData.observe(viewLifecycleOwner) {
+            binding.tvTime.text = it
+        }
+    }
+
+
+    //  Запуск таймера, который (если что-то там есть) возьмет startTime из LocationService.startTime
+    //  И запускать нужно в основном потоке, иначе значения в текст вью меняться не будут!
+    private fun startTimer() {
+        timer?.cancel()
+        timer = Timer()
+        startTime = LocationService.startTime
+        timer?.schedule(object : TimerTask() {
+            override fun run() {
+                activity?.runOnUiThread {
+                    timeData.value = getCurrentTime()
+                }
+            }
+        }, 1000, 1000)
+    }
+
+    //  Функция выбора набора разрешений для более старых и новых версий андроид
     private fun checkLocPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             checkPermissionAfter10()
@@ -102,19 +137,23 @@ class MainFragment : Fragment() {
             checkPermissionBefore10()
         }
     }
+
+
     //   Если больше или равно 10 версии андроида
     @RequiresApi(Build.VERSION_CODES.Q)
     private fun checkPermissionAfter10() {
         if (checkPermission(Manifest.permission.ACCESS_FINE_LOCATION)
-            && checkPermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION)) {
-            initOsm()
+            && checkPermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+        ) {
+//            initOsm()
             checkLocationEnabled()
 
         } else {
-            pLauncher.launch(arrayOf(
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_BACKGROUND_LOCATION
-            )
+            pLauncher.launch(
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                )
             )
         }
     }
@@ -122,49 +161,70 @@ class MainFragment : Fragment() {
     //   Если меньше 10 версии андроида
     private fun checkPermissionBefore10() {
         if (checkPermission(Manifest.permission.ACCESS_FINE_LOCATION)) {
-            initOsm()
+//            initOsm()
             checkLocationEnabled()
         } else {
             pLauncher.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION))
         }
     }
+
     //    Определение включен ли GPS и вызов диалог менеджера, если выключен
-    private fun checkLocationEnabled(){
+    private fun checkLocationEnabled() {
         val lManager = activity?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         val isEnabled = lManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
-        if(!isEnabled){
+        if (!isEnabled) {
             DialogManager.showLocEnableDialog(activity as AppCompatActivity,
-                object: DialogManager.Listener{
+                object : DialogManager.Listener {
                     override fun onClick() {
                         startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
                     }
 
                 })
-        }else{
+        } else {
             showToast("Location enabled")
         }
     }
 
-    private val receiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, i: Intent?) {
-            if (i?.action == LocationService.LOC_MODEL_INTENT) {
-                val locModel = i.getSerializableExtra(LocationService.LOC_MODEL_INTENT) as LocationModel
-
-            }
-        }
+    //  Здесь получаем время следования по маршруту, если приложение закрыли и работал только сервис
+    //  От текущего времени отнимаем стартовое (все в миллисекундах!!!)
+    private fun getCurrentTime(): String {
+        return "Elapsed time: ${TimeUtils.getTime(System.currentTimeMillis() - startTime)}"
     }
 
-    private fun registerLocReceiver() {
-        val locFilter = IntentFilter(LocationService.LOC_MODEL_INTENT)
-        LocalBroadcastManager.getInstance(activity as AppCompatActivity)
-            .registerReceiver(receiver, locFilter)
+
+    //  Функция запуска и остановки сервиса, в зависимости от состояния переменной isServiceRunning
+    private fun startStopService() {
+        if (!isServiceRunning) {
+//            Здесь я подставил включение зеленой кнопки, зачем??????
+            binding.startStop.setImageResource(R.drawable.ic_disalarm_green)
+            startLocService()
+        } else {
+            activity?.stopService(Intent(activity, LocationService::class.java))
+            binding.startStop.setImageResource(R.drawable.ic_disalarm_green)
+            timer?.cancel()
+        }
+        isServiceRunning = !isServiceRunning
+    }
+
+
+    //  Запуск сервиса, в зависимости от нажатия на кнопку "старт" или "стоп"
+    private fun startLocService() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            activity?.startForegroundService(Intent(activity, LocationService::class.java))
+//            Здесь я подставил включение красной кнопки, зачем??????
+            binding.startStop.setImageResource(R.drawable.ic_alarm_red)
+        } else {
+            activity?.startService(Intent(activity, LocationService::class.java))
+        }
+        binding.startStop.setImageResource(R.drawable.ic_alarm_red)
+        LocationService.startTime = System.currentTimeMillis()
+        startTimer()
     }
 
 
     companion object {
 
         @JvmStatic
-        fun newInstance() = RoutesFragment()
+        fun newInstance() = MainFragment()
     }
 }
-

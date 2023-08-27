@@ -1,4 +1,4 @@
-package com.stepa0751.findalertbutton.utils
+package com.stepa0751.finderalertbutton.utils
 
 import android.app.AlertDialog
 import android.content.Context

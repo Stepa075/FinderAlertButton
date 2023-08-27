@@ -13,10 +13,10 @@ import com.stepa0751.finderalertbutton.R
 
 /**
  * A simple [Fragment] subclass.
- * Use the [RoutesFragment.newInstance] factory method to
+ * Use the [MapFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class RoutesFragment : Fragment() {
+class MapFragment : Fragment() {
     // TODO: Rename and change types of parameters
 
 
@@ -45,7 +45,7 @@ class RoutesFragment : Fragment() {
         // TODO: Rename and change types and number of parameters
         @JvmStatic
         fun newInstance() =
-            RoutesFragment().apply {
+            MapFragment().apply {
 
             }
     }
