@@ -7,7 +7,6 @@ import android.content.Intent
 import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
-import android.provider.ContactsContract
 import android.provider.Settings
 import android.util.Log
 import android.view.LayoutInflater
@@ -25,16 +24,10 @@ import com.android.volley.Request
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.stepa0751.finderalertbutton.R
-import com.stepa0751.finderalertbutton.alerts.AlertsModel
 import com.stepa0751.finderalertbutton.databinding.FragmentMainBinding
 import com.stepa0751.finderalertbutton.location.LocationService
 import com.stepa0751.finderalertbutton.utils.DialogManager
 import com.stepa0751.finderalertbutton.utils.TimeUtils
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.Json.Default.decodeFromString
-import org.json.JSONArray
 import org.json.JSONObject
 import showToast
 import java.util.Timer
@@ -111,15 +104,16 @@ class MainFragment : Fragment() {
 
     }
 
-
+    @SuppressLint("NewApi")
     private fun parseServerResponse(response: String){
         var list = JSONObject()
 val mainObject = JSONObject(response)
         val item = mainObject.getJSONArray("result")
         for (i in 0 until item.length()){
             val ddd = item[i] as JSONObject
-            val xxx = ddd as JSONObject
+            val xxx = ddd.get("update_id")
             Log.d("MyLog", "JSON Response: ${ddd.get("update_id")}")
+
 
         }
 //        val item2 = mainObject.getJSONArray("")
