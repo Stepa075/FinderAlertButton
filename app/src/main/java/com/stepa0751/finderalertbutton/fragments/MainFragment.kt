@@ -111,7 +111,7 @@ class MainFragment : Fragment() {
 
     }
 
-    @SuppressLint("NewApi")
+
     private fun parseServerResponse(response: String){
         var list = JSONObject()
 val mainObject = JSONObject(response)
