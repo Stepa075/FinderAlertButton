@@ -1,5 +1,6 @@
 package com.stepa0751.finderalertbutton
 
+import android.graphics.Color
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
@@ -19,7 +20,8 @@ private lateinit var navController: NavController
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setSupportActionBar(binding.actionBar.toolbar)
-
+        val statusBarColor = Color.parseColor("#EDE9E9")
+        window.statusBarColor = statusBarColor
         onNavClicks()
 
     }

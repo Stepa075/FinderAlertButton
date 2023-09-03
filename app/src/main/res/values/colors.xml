@@ -7,4 +7,5 @@
     <color name="blue">#0636C3</color>
     <color name="yellow">#FFA406</color>
     <color name="color_for_floating_actions_button">#C62BD2EF</color>
+    <color name="primary_color_from_bg">#229ED9</color>
 </resources>
