@@ -83,39 +83,39 @@ class MainFragment : Fragment() {
                 .getString("chat_id_key", "")
         }
 
-//        val lat = latit.toString()
-//        val lon = longit.toString()
         val url = "https://api.telegram.org/bot${token_pref}/getUpdates?chat_id=-${chat_id_pref}"
 
         val sRequest = StringRequest(
             Request.Method.GET,
             url, { response ->
-
                 parseServerResponse(response)
-//                val str = response
-//                val list: List<String> = str.split(",").toList()
-//                for (i in list){
-//                   Log.d("MyLog", "Response: $i")
-//                }
+
             },
             { Log.d("MyLog", "Error request: $it") }
         )
         queue.add(sRequest)
 
+
+
     }
 
     @SuppressLint("NewApi")
     private fun parseServerResponse(response: String){
-        var list = JSONObject()
-val mainObject = JSONObject(response)
-        val item = mainObject.getJSONArray("result")
-        for (i in 0 until item.length()){
-            val ddd = item[i] as JSONObject
-            val xxx = ddd.get("update_id")
-            Log.d("MyLog", "JSON Response: ${ddd.get("update_id")}")
+   try {
+       val mainObject = JSONObject(response)
+       val ok = mainObject.get("ok")
+       val item = mainObject.getJSONArray("result")
+       for (i in 0 until item.length()) {
+           val ddd = item[i] as JSONObject
+           val xxx = ddd.get("update_id")
+           Log.d("MyLog", "JSON Response: ok = $ok")
+           Log.d("MyLog", "JSON Response: ${ddd.get("update_id")}")
+       }
+   }
+   catch(e: Exception){
+       Log.d("MyLOg","non parametres")
+   }
 
-
-        }
 //        val item2 = mainObject.getJSONArray("")
 //        val item_x = item2.get
 //        val update_id = item2.getString("update_id")
@@ -125,7 +125,7 @@ val mainObject = JSONObject(response)
 //            update_id = (mainObject.getJSONObject("result").getString("update_id").toInt())
 //
 //        )
-        Log.d("MyLog", "JSON Response: ${mainObject}")
+
 
 //        Log.d("MyLog", "JSON Response: ${item_x}")
 //        Log.d("MyLog", "JSON Response: ${item2}")
