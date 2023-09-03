@@ -6,4 +6,5 @@
     <color name="red">#EC0505</color>
     <color name="blue">#0636C3</color>
     <color name="yellow">#FFA406</color>
+    <color name="color_for_floating_actions_button">#C62BD2EF</color>
 </resources>

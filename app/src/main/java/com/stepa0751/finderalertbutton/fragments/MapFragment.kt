@@ -55,32 +55,32 @@ class MapFragment : Fragment() {
 
     }
 
-    private fun setOnClick() = with(binding){
+    private fun setOnClick() = with(binding) {
         val listener = onClicks()
         buttonCenter.setOnClickListener(listener)
     }
 
-    private fun onClicks(): View.OnClickListener{
+    private fun onClicks(): View.OnClickListener {
         return View.OnClickListener {
-            when(it.id){
+            when (it.id) {
                 R.id.button_center -> centerLocation()
             }
         }
     }
 
-    private fun centerLocation(){
-        binding.map.controller.animateTo(myLocOverlay.myLocation)
+    private fun centerLocation() = with(binding){
+        map.controller.animateTo(myLocOverlay.myLocation)
         myLocOverlay.enableFollowLocation()
-        binding.map.setMultiTouchControls(true)
-       val finishMarker = Marker(binding.map)
+        map.setMultiTouchControls(true)
+        val finishMarker = Marker(map)
         finishMarker.position.latitude = 49.943115
         finishMarker.position.longitude = 36.369750
-        binding.map.overlays.add(finishMarker)
+        map.overlays.add(finishMarker)
 
 
     }
 
-        override fun onResume() {
+    override fun onResume() {
         super.onResume()
         checkLocPermission()
     }
@@ -107,10 +107,12 @@ class MapFragment : Fragment() {
             map.setMultiTouchControls(true)
         }
     }
+
     //  Нихрена эта функция не срабатывает. Запрос на разрешения не появляется.
     private fun registerPermissions() {
         pLauncher = registerForActivityResult(
-            ActivityResultContracts.RequestMultiplePermissions()) {
+            ActivityResultContracts.RequestMultiplePermissions()
+        ) {
 
             if (it[Manifest.permission.ACCESS_FINE_LOCATION] == true) {
                 initOsm()
@@ -121,6 +123,7 @@ class MapFragment : Fragment() {
             }
         }
     }
+
     //   Функция выбора пермиссинов в зависимости от версии андроида
     private fun checkLocPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -129,19 +132,22 @@ class MapFragment : Fragment() {
             checkPermissionBefore10()
         }
     }
+
     //   Если больше или равно 10 версии андроида
     @RequiresApi(Build.VERSION_CODES.Q)
     private fun checkPermissionAfter10() {
         if (checkPermission(Manifest.permission.ACCESS_FINE_LOCATION)
-            && checkPermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION)) {
+            && checkPermission(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+        ) {
             initOsm()
             checkLocationEnabled()
 
         } else {
-            pLauncher.launch(arrayOf(
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_BACKGROUND_LOCATION
-            )
+            pLauncher.launch(
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                )
             )
         }
     }
@@ -155,19 +161,20 @@ class MapFragment : Fragment() {
             pLauncher.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION))
         }
     }
+
     //    Определение включен ли GPS и вызов диалог менеджера, если выключен
-    private fun checkLocationEnabled(){
+    private fun checkLocationEnabled() {
         val lManager = activity?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         val isEnabled = lManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
-        if(!isEnabled){
+        if (!isEnabled) {
             DialogManager.showLocEnableDialog(activity as AppCompatActivity,
-                object: DialogManager.Listener{
+                object : DialogManager.Listener {
                     override fun onClick() {
                         startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
                     }
 
                 })
-        }else{
+        } else {
             showToast("Location enabled")
         }
     }
@@ -175,7 +182,8 @@ class MapFragment : Fragment() {
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, i: Intent?) {
             if (i?.action == LocationService.LOC_MODEL_INTENT) {
-                val locModel = i.getSerializableExtra(LocationService.LOC_MODEL_INTENT) as LocationModel
+                val locModel =
+                    i.getSerializableExtra(LocationService.LOC_MODEL_INTENT) as LocationModel
 
             }
         }

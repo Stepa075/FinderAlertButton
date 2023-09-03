@@ -34,6 +34,12 @@
 
 
     <string name="update_id_summary">Change your CREW ID here</string>
+    <string name="center_of_map">Center of map</string>
+    <string name="elapsed_time_00_00_00">Elapsed time 00:00:00</string>
+    <string name="main">Main</string>
+    <string name="map">Map</string>
+    <string name="settings_in_menu">Settings</string>
+    <string name="category_1">Category 1</string>
 
 
 </resources>
