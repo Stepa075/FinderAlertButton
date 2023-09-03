@@ -2,6 +2,8 @@ package com.stepa0751.finderalertbutton.fragments
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.AlarmManager
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.location.LocationManager
@@ -28,6 +30,7 @@ import com.stepa0751.finderalertbutton.databinding.FragmentMainBinding
 import com.stepa0751.finderalertbutton.location.LocationService
 import com.stepa0751.finderalertbutton.utils.DialogManager
 import com.stepa0751.finderalertbutton.utils.TimeUtils
+import org.json.JSONArray
 import org.json.JSONObject
 import showToast
 import java.util.Timer
@@ -40,6 +43,8 @@ class MainFragment : Fragment() {
     private var startTime = 0L
     val timeData = MutableLiveData<String>()
     private lateinit var pLauncher: ActivityResultLauncher<Array<String>>
+    private var alarmManager: AlarmManager? = null
+    private lateinit var alarmIntent: PendingIntent
 
     //    Создаем переменную binding
     private lateinit var binding: FragmentMainBinding
@@ -61,6 +66,15 @@ class MainFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         registerPermissions()
         checkServiceState()
+//      Здесь, внизу AlarmReceiver заменен на AlarmManager
+        alarmManager = requireActivity().getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        alarmIntent = Intent(context, AlarmManager::class.java).let { intent ->
+            PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+
+        }
+        binding.bStart.setOnClickListener {
+
+        }
         setOnClicks()
         updateTime()
         receiveDataAndLocation()
@@ -68,7 +82,7 @@ class MainFragment : Fragment() {
     }
 
 
-    private fun receiveDataAndLocation(){
+    private fun receiveDataAndLocation() {
         val queue = Volley.newRequestQueue(context)
         val user_id_pref = context?.let {
             PreferenceManager.getDefaultSharedPreferences(it)
@@ -96,42 +110,42 @@ class MainFragment : Fragment() {
         queue.add(sRequest)
 
 
-
     }
 
     @SuppressLint("NewApi")
-    private fun parseServerResponse(response: String){
-   try {
-       val mainObject = JSONObject(response)
-       val ok = mainObject.get("ok")
-       val item = mainObject.getJSONArray("result")
-       for (i in 0 until item.length()) {
-           val ddd = item[i] as JSONObject
-           val xxx = ddd.get("update_id")
-           Log.d("MyLog", "JSON Response: ok = $ok")
-           Log.d("MyLog", "JSON Response: ${ddd.get("update_id")}")
-       }
-   }
-   catch(e: Exception){
-       Log.d("MyLOg","non parametres")
-   }
-
-//        val item2 = mainObject.getJSONArray("")
-//        val item_x = item2.get
-//        val update_id = item2.getString("update_id")
-//        val message = item2.getJSONObject("message")
-//        val text = message.getString("text")
-//        val item = AlertsModel(
-//            update_id = (mainObject.getJSONObject("result").getString("update_id").toInt())
+    private fun parseServerResponse(response: String) {
+        try {
+            val mainObject = JSONObject(response)
+            val ok = mainObject.get("ok")
+            val item = mainObject.get("result")
+            val xxx = item as JSONArray
+            val yyy = item[0]
+            val zzz = yyy as JSONObject
+            val vvv = zzz.get("update_id")
+            val ooo = zzz.get("message")
+            val sss = ooo as JSONObject
+            val hhh = sss.getString("text")
+            Log.d("MyLog", "JSON Response: ok = $ok")
+            Log.d("MyLog", "JSON Response: ok = $item")
+            Log.d("MyLog", "JSON Response: ok = $yyy")
+            Log.d("MyLog", "JSON Response: ok = $vvv")
+            Log.d("MyLog", "JSON Response: ok = $ooo")
+            Log.d("MyLog", "JSON Response: ok = $hhh")
+//            for (i in 0 until item.length()) {
+//                val ddd = item[i] as JSONObject
+//                val xxx = JSONObject("result")
 //
-//        )
+//
+//                Log.d("MyLog", "JSON xxx: ${xxx}")
+//                Log.d("MyLog", "JSON Response: ${ddd.get("update_id")}")
+//            }
+
+        } catch (e: Exception) {
+            Log.d("MyLOg", "non parametres")
+
+        }
 
 
-//        Log.d("MyLog", "JSON Response: ${item_x}")
-//        Log.d("MyLog", "JSON Response: ${item2}")
-//        Log.d("MyLog", "JSON Response: ${update_id}")
-//        Log.d("MyLog", "JSON Response: ${message}")
-//        Log.d("MyLog", "JSON Response: ${text}")
     }
 
     //  Когда возвращаемся в вью проверяем доступность местонахождения в телефоне
