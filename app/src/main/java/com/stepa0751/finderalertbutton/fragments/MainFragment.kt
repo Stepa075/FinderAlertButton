@@ -39,6 +39,7 @@ import java.util.TimerTask
 
 class MainFragment : Fragment() {
 
+
     private var timer: Timer? = null
     private var startTime = 0L
     val timeData = MutableLiveData<String>()
@@ -66,21 +67,10 @@ class MainFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         registerPermissions()
         checkServiceState()
-//      Здесь, внизу AlarmReceiver заменен на AlarmManager
-        alarmManager = requireActivity().getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        alarmIntent = Intent(context, AlarmManager::class.java).let { intent ->
-            PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
-
-        }
-        binding.bStart.setOnClickListener {
-
-        }
         setOnClicks()
         updateTime()
         receiveDataAndLocation()
-
     }
-
 
     private fun receiveDataAndLocation() {
         val queue = Volley.newRequestQueue(context)
@@ -107,9 +97,7 @@ class MainFragment : Fragment() {
             },
             { Log.d("MyLog", "Error request: $it") }
         )
-        queue.add(sRequest)
-
-
+       queue.add(sRequest)
     }
 
     @SuppressLint("NewApi")
@@ -144,8 +132,6 @@ class MainFragment : Fragment() {
             Log.d("MyLOg", "non parametres")
 
         }
-
-
     }
 
     //  Когда возвращаемся в вью проверяем доступность местонахождения в телефоне
@@ -183,6 +169,7 @@ class MainFragment : Fragment() {
     fun setOnClicks() = with(binding) {
         val listener = onClicks()
         startStop.setOnClickListener(listener)
+        bStart.setOnClickListener(listener)
     }
 
     //  Функция сработки слушателя нажатий на этом вью
@@ -190,6 +177,7 @@ class MainFragment : Fragment() {
         return View.OnClickListener {
             when (it.id) {
                 R.id.start_stop -> startStopService()
+                R.id.bStart -> {Log.d("MyLog", "Button start is pressed!")}
             }
         }
     }

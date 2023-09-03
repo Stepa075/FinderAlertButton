@@ -55,7 +55,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:text="Button Start"
+            android:text="Repeat alarm button"
             app:layout_constraintEnd_toEndOf="@+id/tvTime"
             app:layout_constraintStart_toStartOf="@+id/tvTime"
             app:layout_constraintTop_toBottomOf="@+id/tvTime" />

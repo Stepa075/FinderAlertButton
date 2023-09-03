@@ -9,7 +9,6 @@ import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,6 +16,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import checkPermission
 import com.stepa0751.finderalertbutton.R
@@ -26,6 +26,7 @@ import com.stepa0751.finderalertbutton.location.LocationService
 import com.stepa0751.finderalertbutton.utils.DialogManager
 import org.osmdroid.config.Configuration
 import org.osmdroid.library.BuildConfig
+import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 import showToast
@@ -34,7 +35,7 @@ class MapFragment : Fragment() {
 
     private lateinit var pLauncher: ActivityResultLauncher<Array<String>>
     private lateinit var binding: FragmentMapBinding
-
+    private lateinit var myLocOverlay: MyLocationNewOverlay
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -50,10 +51,36 @@ class MapFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         registerPermissions()
         registerLocReceiver()
+        setOnClick()
+
+    }
+
+    private fun setOnClick() = with(binding){
+        val listener = onClicks()
+        buttonCenter.setOnClickListener(listener)
+    }
+
+    private fun onClicks(): View.OnClickListener{
+        return View.OnClickListener {
+            when(it.id){
+                R.id.button_center -> centerLocation()
+            }
+        }
+    }
+
+    private fun centerLocation(){
+        binding.map.controller.animateTo(myLocOverlay.myLocation)
+        myLocOverlay.enableFollowLocation()
+        binding.map.setMultiTouchControls(true)
+       val finishMarker = Marker(binding.map)
+        finishMarker.position.latitude = 49.943115
+        finishMarker.position.longitude = 36.369750
+        binding.map.overlays.add(finishMarker)
 
 
     }
-    override fun onResume() {
+
+        override fun onResume() {
         super.onResume()
         checkLocPermission()
     }
@@ -71,12 +98,13 @@ class MapFragment : Fragment() {
     private fun initOsm() = with(binding) {
         map.controller.setZoom(18.0)
         val myLocProvider = GpsMyLocationProvider(activity)
-        val myLocOverlay = MyLocationNewOverlay(myLocProvider, map)
+        myLocOverlay = MyLocationNewOverlay(myLocProvider, map)
         myLocOverlay.enableMyLocation()
         myLocOverlay.enableFollowLocation()
         myLocOverlay.runOnFirstFix {
             map.overlays.clear()
             map.overlays.add(myLocOverlay)
+            map.setMultiTouchControls(true)
         }
     }
     //  Нихрена эта функция не срабатывает. Запрос на разрешения не появляется.
