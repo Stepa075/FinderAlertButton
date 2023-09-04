@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
     <item android:title="@string/category_1">
+
         <menu>
             <item
                 android:id="@+id/mainFragment"
@@ -10,11 +11,11 @@
                 android:title="@string/main" />
             <item
                 android:id="@+id/mapFragment"
-                android:icon="@drawable/ic_home"
+                android:icon="@drawable/ic_map"
                 android:title="@string/map" />
             <item
                 android:id="@+id/settingsFragment"
-                android:icon="@drawable/ic_home"
+                android:icon="@drawable/ic_settings"
                 android:title="@string/settings_in_menu" />
 
         </menu>

@@ -11,22 +11,22 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.stepa0751.finderalertbutton.databinding.ActivityMainBinding
 
+
 class MainActivity : AppCompatActivity() {
     private lateinit var conf: AppBarConfiguration
     private lateinit var navController: NavController
     private lateinit var binding: ActivityMainBinding
-    private val statusBarColor = Color.parseColor("#EDE9E9")
+    private val statusBarColor = Color.parseColor("#4975CC")
+    private var startTime = 0L
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setSupportActionBar(binding.actionBar.toolbar)
-
         window.statusBarColor = statusBarColor
         onNavClicks()
-
     }
-
 
     private fun onNavClicks() {
         navController = findNavController(R.id.fragmentContainerView)
@@ -45,4 +45,8 @@ class MainActivity : AppCompatActivity() {
         return navController.navigateUp(conf) || super.onSupportNavigateUp()
     }
 
+
 }
+
+
+

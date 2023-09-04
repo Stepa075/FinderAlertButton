@@ -1,4 +1,4 @@
-package com.stepa0751.finderalertbutton
+package com.stepa0751.finderalertbutton.db
 
 import android.content.Context
 import androidx.room.Database
@@ -11,7 +11,7 @@ abstract class MainDb : RoomDatabase(){
     abstract fun getDao(): Dao
 
     companion object{
-        fun getDb(context: Context): MainDb{
+        fun getDb(context: Context): MainDb {
             return Room.databaseBuilder(
                 context.applicationContext,
                 MainDb::class.java,

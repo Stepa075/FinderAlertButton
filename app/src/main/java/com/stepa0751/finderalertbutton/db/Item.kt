@@ -1,4 +1,4 @@
-package com.stepa0751.finderalertbutton
+package com.stepa0751.finderalertbutton.db
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

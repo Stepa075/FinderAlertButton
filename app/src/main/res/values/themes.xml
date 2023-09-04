@@ -1,18 +1,20 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <!-- Base application theme. -->
     <style name="Base.Theme.FinderAlertButton" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+
+        <item name="android:statusBarColor">@color/primary_color_from_bg</item>
     </style>
 
-    <style name="Theme.FinderAlertButton" parent="Base.Theme.FinderAlertButton" />
+    <style name="Theme.FinderAlertButton" parent="Base.Theme.FinderAlertButton" >
 
+        <item name="android:statusBarColor">@color/primary_color_from_bg</item>
+    </style>
 
     <style name="PreferenceScreen" parent="Theme.AppCompat">
         <item name="android:textSize">32sp</item>
         <item name="colorPrimary">@color/primary_color_from_bg</item>
-<!--        <item name="windowActionBar">false</item>-->
-<!--        <item name="windowNoTitle">true</item>-->
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
         <item name="android:statusBarColor">@color/primary_color_from_bg</item>
     </style>
 

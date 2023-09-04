@@ -2,8 +2,6 @@ package com.stepa0751.finderalertbutton.fragments
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.AlarmManager
-import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.location.LocationManager
@@ -19,7 +17,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.*
 import androidx.preference.PreferenceManager
 import checkPermission
 import com.android.volley.Request
@@ -30,22 +28,21 @@ import com.stepa0751.finderalertbutton.databinding.FragmentMainBinding
 import com.stepa0751.finderalertbutton.location.LocationService
 import com.stepa0751.finderalertbutton.utils.DialogManager
 import com.stepa0751.finderalertbutton.utils.TimeUtils
+import kotlinx.coroutines.*
 import org.json.JSONArray
 import org.json.JSONObject
 import showToast
 import java.util.Timer
 import java.util.TimerTask
 
-
 class MainFragment : Fragment() {
 
 
     private var timer: Timer? = null
     private var startTime = 0L
+    private var startTimeForNewService = 0L
     val timeData = MutableLiveData<String>()
     private lateinit var pLauncher: ActivityResultLauncher<Array<String>>
-    private var alarmManager: AlarmManager? = null
-    private lateinit var alarmIntent: PendingIntent
 
     //    Создаем переменную binding
     private lateinit var binding: FragmentMainBinding
@@ -56,11 +53,12 @@ class MainFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+
         // Инициализируем binding c инфлейтером, который пришел нам в onCreateView см. выше
         binding = FragmentMainBinding.inflate(inflater, container, false)
         // полцчаем доступ ко всем элементам разметки
         return binding.root
-    }
+        }
 
     //  Инициализируем все, что необходимо после создания вью
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -70,6 +68,28 @@ class MainFragment : Fragment() {
         setOnClicks()
         updateTime()
         receiveDataAndLocation()
+        Log.d("MyLog", "OnViewCreated")
+        startTimeForNewService = System.currentTimeMillis()
+        lifecycleScope.launch(Dispatchers.Main) {
+            while (true) {
+                val timeNow = System.currentTimeMillis() - startTimeForNewService
+                binding.timerView.text = TimeUtils.getTime(System.currentTimeMillis() - startTimeForNewService)
+                delay(INTERVAL)
+                if(timeNow >= 10000){
+                    startTimeForNewService = System.currentTimeMillis()
+                }
+            }
+        }
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
+    fun onAppBackgrounded(){
+
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_START)
+    fun onAppForegrounded(){
+        Log.d("MyLog", "onAppForegrounded")
     }
 
     private fun receiveDataAndLocation() {
@@ -110,6 +130,7 @@ class MainFragment : Fragment() {
             val yyy = item[0]
             val zzz = yyy as JSONObject
             val vvv = zzz.get("update_id")
+//            Переделать парсер до вменяемого состояния и по возможности с отработкой разных ошибок!
             val ooo = zzz.get("message")
             val sss = ooo as JSONObject
             val hhh = sss.getString("text")
@@ -129,7 +150,7 @@ class MainFragment : Fragment() {
 //            }
 
         } catch (e: Exception) {
-            Log.d("MyLOg", "non parametres")
+            Log.d("MyLOg", "non parametres $e")
 
         }
     }
@@ -138,7 +159,23 @@ class MainFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         checkLocPermission()
+        onAppForegrounded()
+        Log.d("MyLog", "OnResume")
+    }
 
+    override fun onPause() {
+        super.onPause()
+        Log.d("MyLog", "OnPause")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d("MyLog", "OnDestroy")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.d("MyLog", "OnStop")
     }
 
     private fun registerPermissions() {
@@ -147,7 +184,8 @@ class MainFragment : Fragment() {
         ) {
 
             if (it[Manifest.permission.ACCESS_FINE_LOCATION] == true) {
-//                initOsm()
+//               initOsm()
+                Log.d("MyLog", "ACCESS_FINE_LOCATION == true")
                 checkLocationEnabled()
             } else {
                 showToast("You have not given permission for location tracking. The app don't work!")
@@ -300,10 +338,11 @@ class MainFragment : Fragment() {
 
 
     companion object {
-
+        private const val INTERVAL = 10L
         @JvmStatic
         fun newInstance() = MainFragment()
     }
+
 }
 
 
