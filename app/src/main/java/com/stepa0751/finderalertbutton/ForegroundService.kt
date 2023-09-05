@@ -9,14 +9,12 @@ import android.content.Intent
 import android.os.Build
 import android.os.IBinder
 import android.util.Log
-
 import androidx.core.app.NotificationCompat
-import com.stepa0751.finderalertbutton.utils.TimeUtils
 import kotlinx.coroutines.*
 
 
 class ForegroundService : Service() {
-
+    private var startTime: Long = 0L
     private var isServiceStarted = false
     private var notificationManager: NotificationManager? = null
     private var job: Job? = null
@@ -51,41 +49,43 @@ class ForegroundService : Service() {
     private fun processCommand(intent: Intent?) {
         when (intent?.extras?.getString(COMMAND_ID) ?: INVALID) {
             COMMAND_START -> {
-                val startTimeForNewService = intent?.extras?.getLong(STARTED_TIMER_TIME_MS) ?: return
-                commandStart(startTimeForNewService)
+
+                commandStart()
             }
             COMMAND_STOP -> commandStop()
             INVALID -> return
         }
     }
 
-    private fun commandStart(startTimeForNewService: Long) {
+    private fun commandStart() {
         if (isServiceStarted) {
             return
         }
-        Log.i("TAG", "commandStart()")
+        Log.i("MyLog", "commandStart()")
         try {
             moveToStartedState()
             startForegroundAndShowNotification()
-            continueTimer(startTimeForNewService)
+            continueTimer()
         } finally {
             isServiceStarted = true
         }
     }
 
     @OptIn(DelicateCoroutinesApi::class)
-    private fun continueTimer(startTimeForNewService: Long) {
+    private fun continueTimer() {
         job = GlobalScope.launch(Dispatchers.Main) {
             while (true) {
-                val timeNow = System.currentTimeMillis() - startTimeForNewService
+                val timeNow = System.currentTimeMillis() - startTime
                 notificationManager?.notify(
                     NOTIFICATION_ID,
                     getNotification(
-                        TimeUtils.getTime(System.currentTimeMillis() - startTimeForNewService).dropLast(3)
+                        (System.currentTimeMillis() - startTime).displayTime().dropLast(3)
                     )
                 )
                 delay(INTERVAL)
-
+                if (timeNow > 10000) {
+                    startTime = System.currentTimeMillis()
+                }
             }
         }
     }
@@ -94,7 +94,7 @@ class ForegroundService : Service() {
         if (!isServiceStarted) {
             return
         }
-        Log.i("TAG", "commandStop()")
+        Log.i("MyLog", "commandStop()")
         try {
             job?.cancel()
             stopForeground(true)
@@ -106,10 +106,10 @@ class ForegroundService : Service() {
 
     private fun moveToStartedState() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            Log.d("TAG", "moveToStartedState(): Running on Android O or higher")
+            Log.d("MyLog", "moveToStartedState(): Running on Android O or higher")
             startForegroundService(Intent(this, ForegroundService::class.java))
         } else {
-            Log.d("TAG", "moveToStartedState(): Running on Android N or lower")
+            Log.d("MyLog", "moveToStartedState(): Running on Android N or lower")
             startService(Intent(this, ForegroundService::class.java))
         }
     }

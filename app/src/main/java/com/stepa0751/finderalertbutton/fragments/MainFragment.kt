@@ -23,7 +23,12 @@ import checkPermission
 import com.android.volley.Request
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import com.stepa0751.finderalertbutton.COMMAND_ID
+import com.stepa0751.finderalertbutton.COMMAND_START
+import com.stepa0751.finderalertbutton.COMMAND_STOP
+import com.stepa0751.finderalertbutton.ForegroundService
 import com.stepa0751.finderalertbutton.R
+import com.stepa0751.finderalertbutton.STARTED_TIMER_TIME_MS
 import com.stepa0751.finderalertbutton.databinding.FragmentMainBinding
 import com.stepa0751.finderalertbutton.location.LocationService
 import com.stepa0751.finderalertbutton.utils.DialogManager
@@ -37,7 +42,7 @@ import java.util.TimerTask
 
 class MainFragment : Fragment() {
 
-
+    private var isBackGroundServiceRunning = false
     private var timer: Timer? = null
     private var startTime = 0L
     private var startTimeForNewService = 0L
@@ -82,14 +87,35 @@ class MainFragment : Fragment() {
         }
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-    fun onAppBackgrounded(){
 
+    fun onAppBackgrounded(){
+        val startIntent = Intent(activity, ForegroundService::class.java)
+        startIntent.putExtra(COMMAND_ID, COMMAND_START)
+        startIntent.putExtra(STARTED_TIMER_TIME_MS, startTime)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            activity?.startForegroundService(startIntent)
+        } else {
+            activity?.startService(startIntent)
+        }
+        Log.d("MyLog", "onAppBackgrounded")
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_START)
+
     fun onAppForegrounded(){
+        val stopIntent = Intent(activity, ForegroundService::class.java)
+        stopIntent.putExtra(COMMAND_ID, COMMAND_STOP)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            activity?.startForegroundService(stopIntent)
+        } else {
+            activity?.startService(stopIntent)
+        }
         Log.d("MyLog", "onAppForegrounded")
+    }
+
+    fun onAppClosing(){
+        onAppForegrounded()
+        isBackGroundServiceRunning = true
+        Log.d("MyLog", "onAppClosing")
     }
 
     private fun receiveDataAndLocation() {
@@ -159,12 +185,16 @@ class MainFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         checkLocPermission()
-        onAppForegrounded()
+        if(isBackGroundServiceRunning) onAppForegrounded()
+        isBackGroundServiceRunning = false
+
         Log.d("MyLog", "OnResume")
     }
 
     override fun onPause() {
         super.onPause()
+        if(!isBackGroundServiceRunning) onAppBackgrounded()
+        isBackGroundServiceRunning = true
         Log.d("MyLog", "OnPause")
     }
 
@@ -175,6 +205,8 @@ class MainFragment : Fragment() {
 
     override fun onStop() {
         super.onStop()
+        if(!isBackGroundServiceRunning) onAppBackgrounded()
+        isBackGroundServiceRunning = true
         Log.d("MyLog", "OnStop")
     }
 
@@ -215,7 +247,7 @@ class MainFragment : Fragment() {
         return View.OnClickListener {
             when (it.id) {
                 R.id.start_stop -> startStopService()
-                R.id.bStart -> {Log.d("MyLog", "Button start is pressed!")}
+                R.id.bStart -> onAppClosing()
             }
         }
     }

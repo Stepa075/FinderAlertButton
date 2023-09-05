@@ -11,15 +11,10 @@ import android.location.Location
 import android.os.Build
 import android.os.IBinder
 import android.os.Looper
-import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import androidx.preference.Preference
 import androidx.preference.PreferenceManager
-import com.android.volley.Request
-import com.android.volley.toolbox.StringRequest
-import com.android.volley.toolbox.Volley
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -35,10 +30,12 @@ class LocationService : Service() {
 
     //  Переменная для хранения последнего местоположения для измерения расстояния между старой и новой точками
     private var lastLocation: Location? = null
+
     //  Переменная для хранения высчтанного расстояния
     private var distance = 0.0f
-    private  var latit = 0.0f
-    private  var longit = 0.0f
+    private var latit = 0.0f
+    private var longit = 0.0f
+
     //    Эта переменная нужна для того, чтобы подключаться к провайдеру GPS и получать у него данные о местоположении
     private lateinit var locProvider: FusedLocationProviderClient
     private lateinit var locRequest: LocationRequest
@@ -100,9 +97,9 @@ class LocationService : Service() {
     }
 
     //  Инициализация клиента доступа к подписке на местоположение
-    private fun initLocation(){
+    private fun initLocation() {
         //   Создаем объект
-        locRequest =  LocationRequest.create()
+        locRequest = LocationRequest.create()
         //  Назначаем интервал обновления
         val interval_pref = PreferenceManager.getDefaultSharedPreferences(baseContext)
             .getString("update_time_key", "5000")
@@ -122,8 +119,7 @@ class LocationService : Service() {
             super.onLocationResult(lResult)
             val currentLocation = lResult.lastLocation
             if (lastLocation != null && currentLocation != null) {
-                if ((currentLocation?.speed ?: 0.0f) > 0.5) distance += (currentLocation
-                    ?: lastLocation)?.let { lastLocation?.distanceTo(it) }!!
+                if ((currentLocation.speed ?: 0.0f) > 0.5) distance += currentLocation.let { lastLocation?.distanceTo(it) }!!
                 geoPointsList.add(GeoPoint(currentLocation.latitude, currentLocation.longitude))
                 val locModel = LocationModel(
                     currentLocation.speed,
@@ -135,22 +131,16 @@ class LocationService : Service() {
                 latit = currentLocation.latitude.toFloat()
                 longit = currentLocation.longitude.toFloat()
                 sendLocData(locModel)
-                sendDataAndLocation()
-                sendLocation()
 
 
             }
             lastLocation = currentLocation
 
-//            Log.d(
-//                "MyLog",
-//                "Location: ${lResult.lastLocation?.latitude} : ${lResult.lastLocation?.longitude}"
-//            )
 
         }
     }
 
-    private fun sendLocData(locModel: LocationModel){
+    private fun sendLocData(locModel: LocationModel) {
         val i = Intent(LOC_MODEL_INTENT)
         i.putExtra(LOC_MODEL_INTENT, locModel)
         LocalBroadcastManager.getInstance(applicationContext).sendBroadcast(i)
@@ -159,7 +149,7 @@ class LocationService : Service() {
     //  Функция запуска слушателя местоположения, для нее нужны несколько параметров:
     // И с начала в ней идет проверка на разрешение пользователем приложению доступа к местоположению
     //  Так просит котлин, потому что он не понимает что мы уже где-то раньше проверяли это.
-    private fun startLocationUpdates(){
+    private fun startLocationUpdates() {
         if (ActivityCompat.checkSelfPermission(
                 this,
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -177,56 +167,6 @@ class LocationService : Service() {
         )
     }
 
-    private fun sendDataAndLocation(){
-        val user_id_pref = PreferenceManager.getDefaultSharedPreferences(baseContext)
-            .getString("id_user_key", "0000")
-        val token_pref = PreferenceManager.getDefaultSharedPreferences(baseContext)
-            .getString("token_key", "")
-        val chat_id_pref = PreferenceManager.getDefaultSharedPreferences(baseContext)
-            .getString("chat_id_key", "")
-
-        val queue = Volley.newRequestQueue(baseContext)
-        val lat = latit.toString()
-        val lon = longit.toString()
-        val url = "https://api.telegram.org/bot${token_pref}/sendmessage?chat_id=-${chat_id_pref}&text=User ID: ${user_id_pref}. Allert button pressed! Location: ${lat}, ${lon}"
-
-        val sRequest = StringRequest(
-            Request.Method.GET,
-            url, { response ->
-                Log.d("MyLog", "Response: ${response.subSequence(1, 10)}")
-//
-//                val list = getWeatherByDays(response)
-//                dayList.value = list
-//                currentDay.value = list[0]
-            },
-            { Log.d("MyLog", "Error request: $it") }
-        )
-        queue.add(sRequest)
-
-    }
-
-
-    private fun sendLocation(){
-        val token_pref = PreferenceManager.getDefaultSharedPreferences(baseContext)
-            .getString("token_key", "")
-        val chat_id_pref = PreferenceManager.getDefaultSharedPreferences(baseContext)
-            .getString("chat_id_key", "")
-        val lat = latit.toString()
-        val lon = longit.toString()
-        val url = "https://api.telegram.org/bot${token_pref}/sendlocation?chat_id=-${chat_id_pref}&latitude=${lat}&longitude=${lon}"
-        val queue = Volley.newRequestQueue(baseContext)
-        val sRequest = StringRequest(
-            Request.Method.GET,
-            url, { response ->
-                Log.d("MyLog", "Response: ${response.subSequence(1, 10)}")
-//                val list = getWeatherByDays(response)
-//                dayList.value = list
-//                currentDay.value = list[0]
-            },
-            { Log.d("MyLog", "Error request: $it") }
-        )
-        queue.add(sRequest)
-    }
 
     companion object {
         const val CHANNEL_ID = "channel_1"
