@@ -151,33 +151,46 @@ class MainFragment : Fragment() {
         try {
             val mainObject = JSONObject(response)
             val ok = mainObject.get("ok")
-            val item = mainObject.get("result")
-            val xxx = item as JSONArray
-            val yyy = item[0]
-            val zzz = yyy as JSONObject
-            val vvv = zzz.get("update_id")
-//            Переделать парсер до вменяемого состояния и по возможности с отработкой разных ошибок!
-            val ooo = zzz.get("message")
-            val sss = ooo as JSONObject
-            val hhh = sss.getString("text")
             Log.d("MyLog", "JSON Response: ok = $ok")
-            Log.d("MyLog", "JSON Response: ok = $item")
-            Log.d("MyLog", "JSON Response: ok = $yyy")
-            Log.d("MyLog", "JSON Response: ok = $vvv")
-            Log.d("MyLog", "JSON Response: ok = $ooo")
-            Log.d("MyLog", "JSON Response: ok = $hhh")
-//            for (i in 0 until item.length()) {
-//                val ddd = item[i] as JSONObject
-//                val xxx = JSONObject("result")
-//
-//
-//                Log.d("MyLog", "JSON xxx: ${xxx}")
-//                Log.d("MyLog", "JSON Response: ${ddd.get("update_id")}")
-//            }
+            val result = mainObject.get("result") as JSONArray
+            for (results in 0 until result.length()){
+                val item = result[results] as JSONObject
+                val updateId = item.get("update_id")
+                Log.d("MyLog", "JSON Response: update_id = $updateId")
+                val channelPost = item.get("channel_post") as JSONObject
+                try{
+                    val date = channelPost.getString("date")
+                    Log.d("MyLog", "JSON Response: date = $date")
+                } catch (e: Exception){
+                    Log.d("MyLog", "JSON Response: date is $e")
+                }
+                try{
+                    val location = channelPost.get("location") as JSONObject
+                    val location_latitude = location.get("latitude")
+                    val location_longitude = location.get("longitude")
+                    Log.d("MyLog", "JSON Response: location_latitude = $location_latitude")
+                    Log.d("MyLog", "JSON Response: location_longitude = $location_longitude")
+                }catch (e: Exception){
+                    Log.d("MyLog", "JSON Response: location is $e")
+                }
+                try{
+                    val text = channelPost.getString("text")
+                    val textId = text.substringBefore(";").substringAfter(":")
+                    val textAlert = text.substringAfter(";").substringBefore(";")
+                    val textLat = text.substringAfter(";").substringAfter(";").substringBefore(",")
+                    val textLon = text.substringAfter(";").substringAfter(";").substringAfter(",")
 
-        } catch (e: Exception) {
+                    Log.d("MyLog", "JSON Response: text = $text")
+                    Log.d("MyLog", "JSON Response: textId = $textId")
+                    Log.d("MyLog", "JSON Response: textAlert = $textAlert")
+                    Log.d("MyLog", "JSON Response: textLat = $textLat")
+                    Log.d("MyLog", "JSON Response: textLon = $textLon")
+                }catch (e: Exception){
+                    Log.d("MyLog", "JSON Response: text is $e")
+                }
+            }
+        } catch(e: Exception)  {
             Log.d("MyLOg", "non parametres $e")
-
         }
     }
 
