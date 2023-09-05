@@ -34,6 +34,16 @@ import androidx.fragment.app.Fragment
 //        .replace(R.id.placeHolder, f).commit()
 //}
 
+fun findMin(list: List<Int>): Int? {
+    return list.min()
+}
+
+fun findMax(list: List<Int>): Int? {
+    return list.max()
+}
+
+
+
 //Экстеншин функции для показа сообщений во фрагментах и MainActivity
 fun Fragment.showToast(s: String){
     Toast.makeText(activity, s, Toast.LENGTH_SHORT).show()
