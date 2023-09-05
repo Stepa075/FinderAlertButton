@@ -11,4 +11,15 @@ interface Dao {
     fun insertItem(item: Item)
     @Query("SELECT * FROM items")
     fun getAllItem(): Flow<List<Item>>
+    @Query("SELECT `offset` FROM items")
+    fun getOffsetItem(): Flow<List<Item>>
+
+    @Query("SELECT MAX(`offset`) FROM items")
+    fun getMaxOffset(): Flow<List<Item>>
+
+    companion object {
+        fun getAllItem() {
+
+        }
+    }
 }

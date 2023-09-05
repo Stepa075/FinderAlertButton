@@ -17,5 +17,11 @@ data class Item (
     @ColumnInfo(name = "latitude")
     var latitude: Float,
     @ColumnInfo(name = "longitude")
-    var longitude: Float
+    var longitude: Float,
+    @ColumnInfo(name = "latitudeTxt")
+    var latitudeTxt: Float,
+    @ColumnInfo(name = "longitudeTxt")
+    var longitudeTxt: Float,
+    @ColumnInfo(name = "offset")
+    var offset: Long
 )
